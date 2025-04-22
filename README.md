@@ -1,1 +1,1 @@
-# MAFIA
+# MAFIA_GAME
