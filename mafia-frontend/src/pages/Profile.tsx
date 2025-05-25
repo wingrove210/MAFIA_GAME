@@ -26,7 +26,7 @@ const Profile: React.FC = () => {
   if (!profile) return <div>Загрузка...</div>;
 
   return (
-    <div className="max-w-xs mx-auto mt-10">
+    <div className="h-full text-black mx-auto mt-10">
       <h2 className="text-xl font-bold mb-2">Профиль</h2>
       <div>Никнейм: {profile.username}</div>
       <div>Email: {profile.email}</div>

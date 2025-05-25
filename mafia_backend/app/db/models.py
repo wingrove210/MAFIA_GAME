@@ -58,3 +58,12 @@ class User(Base):
     username = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
+    
+class Booking(Base):
+    __tablename__ = "bookings"
+    id = Column(Integer, primary_key=True, index=True)
+    seat_id = Column(Integer, unique=True, nullable=False)  # 1..20
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    is_booked = Column(Boolean, default=False)
+
+    user = relationship("User", backref="bookings")

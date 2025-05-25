@@ -383,7 +383,7 @@ export default function Celendar() {
   // инициализация мест
   useEffect(() => {
     const newSeats = [];
-    for (let i = 0; i < 88; i++) {
+    for (let i = 0; i < 20; i++) {
       newSeats.push(randomItem(possibleSeats));
     }
     setSeats(newSeats);

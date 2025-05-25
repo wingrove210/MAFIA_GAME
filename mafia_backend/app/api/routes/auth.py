@@ -3,6 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.auth import UserCreate, UserLogin, UserOut
 from core.auth_logic import create_user, authenticate_user, get_user_by_username
 from db.database import get_db
+from sqlalchemy import select
+from db.models import User
 
 router = APIRouter()
 
@@ -27,3 +29,9 @@ async def get_profile(username: str, db: AsyncSession = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+@router.get("/", response_model=list[UserOut])
+async def get_all_users(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User))
+    users = result.scalars().all()
+    return users

@@ -6,8 +6,5 @@ export const Route = createFileRoute('/profile')({
 })
 
 function RouteComponent() {
-  return 
-  <ProtectedRoute>
-        <Profile/>
-  </ProtectedRoute>
+  return <Profile/>
 }
