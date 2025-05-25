@@ -14,7 +14,9 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as VoteImport } from './routes/vote'
 import { Route as RegisterImport } from './routes/register'
 import { Route as ProfileImport } from './routes/profile'
+import { Route as PreloaderImport } from './routes/preloader'
 import { Route as GameRoomImport } from './routes/game-room'
+import { Route as CelendarImport } from './routes/celendar'
 import { Route as AuthImport } from './routes/auth'
 import { Route as IndexImport } from './routes/index'
 
@@ -38,9 +40,21 @@ const ProfileRoute = ProfileImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const PreloaderRoute = PreloaderImport.update({
+  id: '/preloader',
+  path: '/preloader',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const GameRoomRoute = GameRoomImport.update({
   id: '/game-room',
   path: '/game-room',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CelendarRoute = CelendarImport.update({
+  id: '/celendar',
+  path: '/celendar',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -74,11 +88,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
+    '/celendar': {
+      id: '/celendar'
+      path: '/celendar'
+      fullPath: '/celendar'
+      preLoaderRoute: typeof CelendarImport
+      parentRoute: typeof rootRoute
+    }
     '/game-room': {
       id: '/game-room'
       path: '/game-room'
       fullPath: '/game-room'
       preLoaderRoute: typeof GameRoomImport
+      parentRoute: typeof rootRoute
+    }
+    '/preloader': {
+      id: '/preloader'
+      path: '/preloader'
+      fullPath: '/preloader'
+      preLoaderRoute: typeof PreloaderImport
       parentRoute: typeof rootRoute
     }
     '/profile': {
@@ -110,7 +138,9 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/celendar': typeof CelendarRoute
   '/game-room': typeof GameRoomRoute
+  '/preloader': typeof PreloaderRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/vote': typeof VoteRoute
@@ -119,7 +149,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/celendar': typeof CelendarRoute
   '/game-room': typeof GameRoomRoute
+  '/preloader': typeof PreloaderRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/vote': typeof VoteRoute
@@ -129,7 +161,9 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/celendar': typeof CelendarRoute
   '/game-room': typeof GameRoomRoute
+  '/preloader': typeof PreloaderRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/vote': typeof VoteRoute
@@ -137,14 +171,32 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/game-room' | '/profile' | '/register' | '/vote'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/celendar'
+    | '/game-room'
+    | '/preloader'
+    | '/profile'
+    | '/register'
+    | '/vote'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/game-room' | '/profile' | '/register' | '/vote'
+  to:
+    | '/'
+    | '/auth'
+    | '/celendar'
+    | '/game-room'
+    | '/preloader'
+    | '/profile'
+    | '/register'
+    | '/vote'
   id:
     | '__root__'
     | '/'
     | '/auth'
+    | '/celendar'
     | '/game-room'
+    | '/preloader'
     | '/profile'
     | '/register'
     | '/vote'
@@ -154,7 +206,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  CelendarRoute: typeof CelendarRoute
   GameRoomRoute: typeof GameRoomRoute
+  PreloaderRoute: typeof PreloaderRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   VoteRoute: typeof VoteRoute
@@ -163,7 +217,9 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  CelendarRoute: CelendarRoute,
   GameRoomRoute: GameRoomRoute,
+  PreloaderRoute: PreloaderRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   VoteRoute: VoteRoute,
@@ -181,7 +237,9 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/auth",
+        "/celendar",
         "/game-room",
+        "/preloader",
         "/profile",
         "/register",
         "/vote"
@@ -193,8 +251,14 @@ export const routeTree = rootRoute
     "/auth": {
       "filePath": "auth.tsx"
     },
+    "/celendar": {
+      "filePath": "celendar.tsx"
+    },
     "/game-room": {
       "filePath": "game-room.tsx"
+    },
+    "/preloader": {
+      "filePath": "preloader.tsx"
     },
     "/profile": {
       "filePath": "profile.tsx"

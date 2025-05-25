@@ -1,53 +1,29 @@
 import React, { useState } from "react";
-import { login } from "../../api/userApi";
+import { login } from "../api/userApi";
 import { useNavigate } from '@tanstack/react-router';
-import { AxiosError } from "axios";
-import { useDispatch } from "react-redux";
-import { setProfile } from "../redux/profileSlice";
 
-type FastAPIValidationError = {
-    loc: (string | number)[];
-    msg: string;
-    type: string;
-    input?: unknown;
-  };
 const Login: React.FC = () => {
-    const [telegram_id, setTelegramId] = useState("")
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     try {
-      const user = await login({ telegram_id, username, password });
-      localStorage.setItem("user", JSON.stringify(user));
-      dispatch(setProfile(user));
+      const data = await login({ username, password });
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("username", username);
       navigate({ to: "/profile" });
-    } catch (err) {
-      const error = err as AxiosError<{ detail: string | FastAPIValidationError[] }>;
-      const detail = error.response?.data?.detail;
-      if (typeof detail === "string") {
-        setError(detail);
-      } else if (Array.isArray(detail)) {
-        setError(detail.map((d: FastAPIValidationError) => d.msg).join(", "));
-      } else {
-        setError("Ошибка авторизации");
-      }
+    } catch  {
+      setError("Неверный логин или пароль");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2 max-w-xs mx-auto mt-10">
       <h2 className="text-xl font-bold">Вход</h2>
-      <input
-       placeholder="Telegram Id"
-       value={telegram_id}
-       onChange={e => setTelegramId(e.target.value)}
-       required
-      />
       <input
         placeholder="Никнейм"
         value={username}
@@ -63,7 +39,6 @@ const handleSubmit = async (e: React.FormEvent) => {
       />
       <button type="submit" className="bg-blue-600 text-white py-2 rounded">Войти</button>
       {error && <div className="text-red-600">{error}</div>}
-      <button onClick={() => navigate({ to: "/register" })}>Register</button>
     </form>
   );
 };

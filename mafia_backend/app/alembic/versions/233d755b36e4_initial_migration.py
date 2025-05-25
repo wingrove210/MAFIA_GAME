@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 7ca26a59964f
+Revision ID: 233d755b36e4
 Revises: 
-Create Date: 2025-04-19 12:03:46.396296
+Create Date: 2025-05-24 19:19:40.765674
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '7ca26a59964f'
+revision: str = '233d755b36e4'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -36,10 +36,23 @@ def upgrade() -> None:
     sa.Column('username', sa.String(), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('password', sa.String(), nullable=False),
+    sa.Column('role', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('telegram_id')
     )
     op.create_index(op.f('ix_players_id'), 'players', ['id'], unique=False)
+    op.create_table('users',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('email', sa.String(), nullable=False),
+    sa.Column('username', sa.String(), nullable=False),
+    sa.Column('hashed_password', sa.String(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
+    op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
+    op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
     op.create_table('messages',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('player_id', sa.Integer(), nullable=True),
@@ -55,7 +68,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('player_id', sa.Integer(), nullable=True),
     sa.Column('game_id', sa.Integer(), nullable=True),
-    sa.Column('role', sa.Integer(), nullable=True),
+    sa.Column('role', sa.String(), nullable=True),
     sa.Column('is_alive', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['game_id'], ['games.id'], ),
     sa.ForeignKeyConstraint(['player_id'], ['players.id'], ),
@@ -72,6 +85,10 @@ def downgrade() -> None:
     op.drop_table('player_game')
     op.drop_index(op.f('ix_messages_id'), table_name='messages')
     op.drop_table('messages')
+    op.drop_index(op.f('ix_users_username'), table_name='users')
+    op.drop_index(op.f('ix_users_id'), table_name='users')
+    op.drop_index(op.f('ix_users_email'), table_name='users')
+    op.drop_table('users')
     op.drop_index(op.f('ix_players_id'), table_name='players')
     op.drop_table('players')
     op.drop_index(op.f('ix_games_id'), table_name='games')

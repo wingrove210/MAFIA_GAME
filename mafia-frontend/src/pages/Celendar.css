@@ -1,0 +1,16 @@
+@import url("https://fonts.googleapis.com/css?family=Lato:400,700,900");
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  font-family: "Lato", sans-serif;
+}
+.available {
+  color: #2dcff8;
+}
+.reserved {
+  color: hsl(0, 0%, 95%);
+}
+.selected {
+  color: var(--accent, #fd6d8e);
+}
