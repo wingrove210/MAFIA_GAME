@@ -13,11 +13,10 @@ const Register: React.FC = () => {
     e.preventDefault();
     setError("");
     try {
-      await register({ email, username, password });
-      // Автоматический логин после регистрации
-      const data: { access_token: string } = await login({ username, password });
-      localStorage.setItem("token", data.access_token);
+      const response = await register({ email, username, password });
+      const data = response.data; // <-- добавлено
       localStorage.setItem("username", username);
+      localStorage.setItem("user_id", String(data.user_id)); // <-- исправлено
       navigate({ to: "/profile" });
     } catch {
       setError("Ошибка регистрации");

@@ -15,6 +15,7 @@ const Login: React.FC = () => {
       const data = await login({ username, password });
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("username", username);
+      localStorage.setItem("user_id", String(data.user_id)); // <-- добавлено
       navigate({ to: "/profile" });
     } catch  {
       setError("Неверный логин или пароль");

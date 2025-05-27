@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import './Celendar.css'
+import { fetchSeats, toggleBooking, BookingResponse } from '../api/bookingApi';
+
 // SVG icons
 const SVGIcons = () => (
   <svg display="none" viewBox="0 0 100 100">
@@ -372,58 +374,91 @@ const Phone = ({
 // randomItem helper
 const randomItem = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
 
+// Mock API functions for seat reservation/freeing
+async function reserveSeat(seatIndex: number): Promise<void> {
+  // Simulate API call delay
+  return new Promise((resolve) => setTimeout(resolve, 200));
+}
+
+async function freeSeat(seatIndex: number): Promise<void> {
+  // Simulate API call delay
+  return new Promise((resolve) => setTimeout(resolve, 200));
+}
+
+// Mock fetchSeats function
+// async function fetchSeats(): Promise<string[]> {
+//   // Simulate fetching 20 seats with random status
+//   const possibleSeats = ['available', 'reserved'];
+//   return Array.from({ length: 20 }, () => randomItem(possibleSeats));
+// }
+
 // Основной компонент Celendar
 export default function Celendar() {
-  const [seats, setSeats] = useState<string[]>([]);
+  const [seats, setSeats] = useState<BookingResponse[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<{ seat: number, price: string }[]>([]);
   const [total, setTotal] = useState(0);
   const price = 6;
-  const possibleSeats = ['available', 'reserved'];
+  const userId = 1; // замените на реального пользователя
 
   // инициализация мест
   useEffect(() => {
-    const newSeats = [];
-    for (let i = 0; i < 20; i++) {
-      newSeats.push(randomItem(possibleSeats));
-    }
-    setSeats(newSeats);
+    fetchSeats()
+      .then(setSeats)
+      .catch(() => {
+        // fallback на случай ошибки
+        const newSeats = [];
+        for (let i = 0; i < 20; i++) {
+          newSeats.push({ seat_id: i, is_booked: false, user_id: 0 }); // <--- исправлено
+        }
+        setSeats(newSeats);
+      });
   }, []);
 
   // обновление выбранных мест и суммы
   useEffect(() => {
     const selSeats: { seat: number, price: string }[] = [];
     let sum = 0;
-    seats.forEach((seat, index) => {
-      if (seat === 'selected') {
-        selSeats.push({ seat: index, price: `$${price}` });
+    seats.forEach((seat) => {
+      if (seat.is_booked && seat.user_id === userId) {
+        selSeats.push({ seat: seat.seat_id, price: `$${price}` });
         sum += price;
       }
     });
     setSelectedSeats(selSeats);
     setTotal(sum);
-  }, [seats]);
+  }, [seats, userId]);
 
-  // обработчик выбора места
-  const toggleSeat = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+  // обработчик выбора/отмены бронирования
+  const toggleSeat = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
     const seatIndex = Number(e.currentTarget.getAttribute('data-index'));
-    const seatStatus = e.currentTarget.getAttribute('data-status');
-    if (seatStatus === 'reserved') return;
-    setSeats(prev => {
-      const newSeats = [...prev];
-      newSeats[seatIndex] = seatStatus === 'available' ? 'selected' : 'available';
-      return newSeats;
-    });
-  }, []);
+    const seat = seats[seatIndex];
+    if (!seat) return;
+    try {
+      const updated = await toggleBooking(seat.seat_id, userId);
+      setSeats(prev =>
+        prev.map(s =>
+          s.seat_id === updated.seat_id ? updated : s
+        )
+      );
+    } catch (err) {
+      alert('Ошибка бронирования!');
+    }
+  }, [seats, userId]);
 
-  // обработчик удаления места
-  const removeSeat = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    const seatIndex = Number(e.currentTarget.getAttribute('data-index'));
-    setSeats(prev => {
-      const newSeats = [...prev];
-      newSeats[seatIndex] = 'available';
-      return newSeats;
-    });
-  }, []);
+  // обработчик удаления места (тоже toggle)
+  const removeSeat = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const seatId = Number(e.currentTarget.getAttribute('data-index'));
+    try {
+      const updated = await toggleBooking(seatId, userId);
+      setSeats(prev =>
+        prev.map(s =>
+          s.seat_id === updated.seat_id ? updated : s
+        )
+      );
+    } catch (err) {
+      alert('Ошибка отмены!');
+    }
+  }, [userId]);
 
   // --- вставь сюда компоненты Header, Legend, Theater, Details, Checkout, Phone, Main из твоего примера ---
 
@@ -435,7 +470,7 @@ export default function Celendar() {
       <Phone
         theme="dark"
         total={total}
-        seats={seats}
+        seats={seats.map(s => s.is_booked ? (s.user_id === userId ? 'selected' : 'reserved') : 'available')}
         toggleSeat={toggleSeat}
         removeSeat={removeSeat}
         selectedSeats={selectedSeats}
